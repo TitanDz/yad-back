@@ -30,6 +30,11 @@ func main() {
 		log.Fatalf("Failed to initialize database: %v", err)
 	}
 
+	// Run database migrations
+	if err := database.RunMigrations(db); err != nil {
+		log.Fatalf("Failed to run migrations: %v", err)
+	}
+
 	// Create Fiber app
 	app := fiber.New(fiber.Config{
 		AppName: "YAD API v1",

@@ -10,6 +10,7 @@ type Config struct {
 	Port     string
 	Env      string
 	Database DatabaseConfig
+	JWT      JWTConfig
 	Datadog  DatadogConfig
 }
 
@@ -20,6 +21,12 @@ type DatabaseConfig struct {
 	Password string
 	Name     string
 	MaxConn  int
+}
+
+type JWTConfig struct {
+	Secret          string
+	AccessDuration  int // minutes
+	RefreshDuration int // hours
 }
 
 type DatadogConfig struct {
@@ -58,6 +65,11 @@ func LoadConfig() *Config {
 			Password: getEnv("DB_PASSWORD", ""),
 			Name:     getEnv("DB_NAME", "yad_db"),
 			MaxConn:  10,
+		},
+		JWT: JWTConfig{
+			Secret:          getEnv("JWT_SECRET", "dev-secret-key-change-in-production"),
+			AccessDuration:  15,     // 15 minutes
+			RefreshDuration: 7 * 24, // 7 days
 		},
 		Datadog: DatadogConfig{
 			Enabled:     getEnv("DATADOG_ENABLED", "false") == "true",

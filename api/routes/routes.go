@@ -53,6 +53,26 @@ func SetupRoutes(app *fiber.App, h *handler.Handlers) {
 	settings.Put("", h.Settings.UpdateSettings)
 	settings.Put("/:key", h.Settings.UpdateSingleSetting)
 
+	// Notification routes (protected)
+	notifications := v1.Group("/notifications")
+	notifications.Use(middleware.AuthMiddleware)
+	notifications.Post("", h.Notification.CreateNotification)
+	notifications.Get("", h.Notification.GetNotifications)
+	notifications.Get("/unread-count", h.Notification.GetUnreadCount)
+	notifications.Put("/:id/read", h.Notification.MarkAsRead)
+	notifications.Put("/read-all", h.Notification.MarkAllAsRead)
+	notifications.Delete("/:id", h.Notification.DeleteNotification)
+
+	// Place routes (protected)
+	places := v1.Group("/places")
+	places.Use(middleware.AuthMiddleware)
+	places.Post("/saved", h.Place.SavePlace)
+	places.Get("/saved", h.Place.GetSavedPlaces)
+	places.Get("/saved/:placeId", h.Place.CheckSavedPlace)
+	places.Delete("/saved/:id", h.Place.RemoveSavedPlace)
+	places.Put("/saved/:id", h.Place.UpdatePlace)
+	places.Get("/search", h.Place.SearchPlaces)
+
 	// Health check
 	v1.Get("/health", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{"status": "healthy"})
